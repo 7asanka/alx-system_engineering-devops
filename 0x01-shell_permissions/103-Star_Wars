@@ -1,2 +1,2 @@
 #!/bin/bash
-echo 
+chmod +x play_star_wars.sh 
