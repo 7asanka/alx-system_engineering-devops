@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #12 hours and 59 minutes
-hours=1
+hours=0
 minutes=1
 
 while [ $hours -le 12 ]
