@@ -1,27 +1,31 @@
 #!/usr/bin/env bash
-# Configure your Nginx server to have a custom 404 page
+# Configure Nginx server with a custom 404 page that contains "Ceci n'est pas une page"
 
+set -e
+
+# Update package lists and install Nginx
+echo "Installing Nginx..."
 apt-get update
 apt-get install -y nginx
 
+ufw allow 'Nginx HTTP'
+
 echo "Hello World!" > /var/www/html/index.html
+
 echo "Ceci n'est pas une page" > /var/www/html/404.html
 
-printf %s "server {
-    listen 80;
+CUSTOM_404_CONF="server {
+    listen 80 default_server;
     listen [::]:80 default_server;
-    root   /var/www/html;
-    index  index.html index.htm;
+    root /var/www/html;
+    index index.html;
 
-    location /redirect_me {
-        return 301 https://www.tutorialspoint.com/sql/index.htm;
-    }
-
+    # Custom 404 error page
     error_page 404 /404.html;
-    location /404 {
-      root /etc/nginx/html;
-      internal;
+    location = /404.html {
+        internal;
     }
-}" > /etc/nginx/sites-available/default
+}"
+echo "$CUSTOM_404_CONF" > /etc/nginx/sites-available/default
 
-service nginx restart
+nginx -s reload || service nginx restart
