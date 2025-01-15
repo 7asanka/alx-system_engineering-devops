@@ -7,12 +7,11 @@ echo "Hello World!" > /var/www/html/index.html
 REDIRECT_CONF="server {
     listen 80;
     server_name _;
+    root /var/www/html;
+    index index.html index.htm;
+
     location /redirect_me {
         return 301 https://www.tutorialspoint.com/sql/index.htm;
-    }
-    location / {
-        root /var/www/html;
-        index index.html;
     }
 }"
 echo "$REDIRECT_CONF" > /etc/nginx/sites-available/default
