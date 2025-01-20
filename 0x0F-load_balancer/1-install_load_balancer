@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Install and configure HAProxy on lb-01
+
+set -e
+
+# Update package lists and install HAProxy
+echo "Installing HAProxy..."
+apt-get update
+apt-get install -y haproxy
+
+# Backup the default HAProxy configuration file
+echo "Backing up the default HAProxy configuration..."
+cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+
+# Configure HAProxy for roundrobin load balancing
+echo "Configuring HAProxy..."
+cat <<EOL > /etc/haproxy/haproxy.cfg
+# Global settings
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+# Default settings
+defaults
+    log     global
+    option  httplog
+    option  dontlognull
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+# Frontend configuration
+frontend http_front
+    bind *:80
+    default_backend http_back
+
+# Backend configuration
+backend http_back
+    balance roundrobin
+    server 923402-web-01 52.91.149.156:80 check
+    server 923402-web-02 100.26.215.5:80 check
+
+# Enable HAProxy stats page
+listen stats
+    bind *:8080
+    stats enable
+    stats uri /
+    stats refresh 10s
+EOL
+
+# Restart HAProxy to apply the configuration
+echo "Restarting HAProxy..."
+systemctl restart haproxy
+systemctl enable haproxy
+
+echo "HAProxy setup is complete. It is now load-balancing traffic to web-01 and web-02."
