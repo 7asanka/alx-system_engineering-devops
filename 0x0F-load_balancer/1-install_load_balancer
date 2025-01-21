@@ -40,7 +40,7 @@ frontend http_front
 # Backend configuration
 backend http_back
     balance roundrobin
-    server 923402-web-01 52.91.149.156:80 check
+    server 923402-web-01 100.26.239.187:80 check
     server 923402-web-02 100.24.240.29:80 check
 
 # Enable HAProxy stats page
