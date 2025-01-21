@@ -1,37 +1,39 @@
 #!/usr/bin/env bash
-# Configure Nginx server with a custom 404 page, redirection, and custom HTTP header
+# Configures Nginx to include a custom X-Served-By header on a new Ubuntu machine
 
-# Update package lists and install Nginx
+set -e
+
+# Install Nginx
+echo "Installing Nginx..."
 apt-get update
 apt-get install -y nginx
 
-# Allow HTTP traffic
+# Allow HTTP traffic through the firewall
+echo "Allowing HTTP traffic..."
 ufw allow 'Nginx HTTP'
 
 # Create the index.html file
+echo "Creating index.html..."
 echo "Hello World!" > /var/www/html/index.html
 
-# Create the custom 404 page
-echo "Ceci n'est pas une page" > /var/www/html/404.html
-
-# Update the Nginx configuration using sed
+# Configure the X-Served-By header in Nginx
 NGINX_CONF="/etc/nginx/sites-available/default"
+echo "Configuring Nginx for X-Served-By header..."
+sed -i '/location \/ {/a \        add_header X-Served-By \$hostname;' "$NGINX_CONF"
 
-# Add the /redirect_me redirection if not already present
-if ! grep -q "location = /redirect_me" "$NGINX_CONF"; then
-    sed -i "/server_name _;/a \    location = /redirect_me {\n        return 301 https://www.tutorialspoint.com/sql/index.htm;\n    }" "$NGINX_CONF"
-fi
-
-# Add the custom 404 error page if not already present
-if ! grep -q "error_page 404 /404.html;" "$NGINX_CONF"; then
-    sed -i "/server_name _;/a \    error_page 404 /404.html;\n    location = /404.html {\n        internal;\n    }" "$NGINX_CONF"
-fi
-
-# Add the custom HTTP response header
-if ! grep -q "add_header X-Served-By" "$NGINX_CONF"; then
-    sed -i "/server_name _;/a \    location / {\n        add_header X-Served-By \$hostname;\n        try_files \$uri \$uri/ =404;\n    }" "$NGINX_CONF"
-fi
-
-# Test and restart Nginx
+# Test and reload Nginx
+echo "Testing Nginx configuration..."
 nginx -t
-sudo service nginx restart
+
+echo "Reloading Nginx..."
+nginx -s reload || service nginx restart
+
+# Verify the setup
+echo "Verifying the X-Served-By header..."
+if curl -sI http://localhost | grep -q "X-Served-By"; then
+    echo "X-Served-By header is properly configured."
+    exit 0
+else
+    echo "Failed to configure X-Served-By header."
+    exit 1
+fi
