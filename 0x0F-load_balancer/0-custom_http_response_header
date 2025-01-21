@@ -35,5 +35,3 @@ fi
 # Test and restart Nginx
 nginx -t
 sudo service nginx restart
-
-echo "Nginx is now configured with custom 404 page, redirection, and X-Served-By header."

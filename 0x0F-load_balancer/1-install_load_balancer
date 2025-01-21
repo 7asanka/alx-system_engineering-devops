@@ -4,16 +4,13 @@
 set -e
 
 # Update package lists and install HAProxy
-echo "Installing HAProxy..."
 apt-get update
 apt-get install -y haproxy
 
 # Backup the default HAProxy configuration file
-echo "Backing up the default HAProxy configuration..."
 cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
 
 # Configure HAProxy for roundrobin load balancing
-echo "Configuring HAProxy..."
 cat <<EOL > /etc/haproxy/haproxy.cfg
 # Global settings
 global
@@ -55,8 +52,5 @@ listen stats
 EOL
 
 # Restart HAProxy to apply the configuration
-echo "Restarting HAProxy..."
 systemctl restart haproxy
 systemctl enable haproxy
-
-echo "HAProxy setup is complete. It is now load-balancing traffic to web-01 and web-02."
