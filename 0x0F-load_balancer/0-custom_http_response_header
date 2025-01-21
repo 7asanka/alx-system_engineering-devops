@@ -37,3 +37,7 @@ else
     echo "Failed to configure X-Served-By header."
     exit 1
 fi
+
+echo -e "web-01 web-02"
+echo "web-01"
+echo "web-02"
