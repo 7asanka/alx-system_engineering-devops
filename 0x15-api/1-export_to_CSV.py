@@ -2,11 +2,9 @@
 """
 Python script to export data in the CSV format.
 """
-
 import csv
 import requests
 import sys
-
 
 if __name__ == "__main__":
 
@@ -14,23 +12,18 @@ if __name__ == "__main__":
 
     url = "https://jsonplaceholder.typicode.com"
 
-    user_info = requests.get("{}/users/{}".format(url, employee_id))
-    employee_data = user_info.json()
-    employee_name = employee_data.get("name")
+    user_response = requests.get(f"{url}/users/{employee_id}")
 
-    todos_info = requests.get("{}/todos?userId={}".format(
-        url, employee_id))
-    todos = todos_info.json()
+    user_data = user_response.json()
+    username = user_data.get("username")
 
-    completed_tasks = [todo.get("title") for todo in todos
-                       if todo.get("completed") is True]
-    tasks_len = len(todos)
-    completed_len = len(completed_tasks)
+    todos_response = requests.get(f"{url}/todos?userId={employee_id}")
+    todos = todos_response.json()
 
-    filename = "{}.csv".format(employee_id)
+    csv_filename = f"{employee_id}.csv"
 
-    with open(filename, mode='w', newline='') as file:
+    with open(csv_filename, mode='w', newline='') as file:
         writer = csv.writer(file, quoting=csv.QUOTE_ALL)
         for task in todos:
-            writer.writerow([employee_id, employee_name,
+            writer.writerow([employee_id, username,
                             task["completed"], task["title"]])
