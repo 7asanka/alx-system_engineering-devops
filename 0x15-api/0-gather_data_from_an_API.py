@@ -18,7 +18,8 @@ if __name__ == "__main__":
     employee_data = user_info.json()
     employee_name = employee_data.get("name")
 
-    todos_info = requests.get("{}/users/{}/todos".format(url, employee_id))
+    todos_info = requests.get("{}/todos?userId={}".format(
+        url, employee_id))
     todos = todos_info.json()
 
     completed_tasks = [todo.get("title") for todo in todos
