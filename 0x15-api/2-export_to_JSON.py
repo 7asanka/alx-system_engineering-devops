@@ -2,9 +2,12 @@
 """
 Python script to export data in the JSON format
 """
+
+
 from json import dump
 from requests import get
 from sys import argv
+
 
 if __name__ == "__main__":
 
